@@ -5,7 +5,7 @@ import { HealthModule } from './health/health.module';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
-import { configValidationSchema } from './config/config.validation';
+import { validateConfig } from './config/config.validation';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { configValidationSchema } from './config/config.validation';
       isGlobal: true,
       load: [appConfig, databaseConfig, jwtConfig],
       envFilePath: '.env',
-      validationSchema: configValidationSchema,
+      validate: validateConfig,
     }),
     DatabaseModule,
     HealthModule,

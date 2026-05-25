@@ -1,22 +1,37 @@
-import * as Joi from 'joi';
+import { z } from 'zod';
 
-export const configValidationSchema = Joi.object({
-  NODE_ENV: Joi.string()
-    .valid('development', 'production', 'test')
+const configSchema = z.object({
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
     .default('development'),
-  PORT: Joi.number().default(3000),
-  APP_NAME: Joi.string().default('HRM Backend'),
+  PORT: z.coerce.number().default(3000),
+  APP_NAME: z.string().default('HRM Backend'),
 
-  DB_HOST: Joi.string().required(),
-  DB_PORT: Joi.number().default(3306),
-  DB_USERNAME: Joi.string().required(),
-  DB_PASSWORD: Joi.string().required(),
-  DB_NAME: Joi.string().required(),
-  MYSQL_ROOT_PASSWORD: Joi.string().optional(),
+  DB_HOST: z.string({ error: 'DB_HOST is required' }),
+  DB_PORT: z.coerce.number().default(3306),
+  DB_USERNAME: z.string({ error: 'DB_USERNAME is required' }),
+  DB_PASSWORD: z.string({ error: 'DB_PASSWORD is required' }),
+  DB_NAME: z.string({ error: 'DB_NAME is required' }),
+  MYSQL_ROOT_PASSWORD: z.string().optional(),
 
-  // Optional until Auth module is built — will be made required then
-  JWT_SECRET: Joi.string().optional(),
-  JWT_EXPIRES_IN: Joi.string().default('7d'),
-  JWT_REFRESH_SECRET: Joi.string().optional(),
-  JWT_REFRESH_EXPIRES_IN: Joi.string().default('30d'),
+  // Required when Auth module is added
+  JWT_SECRET: z.string().optional(),
+  JWT_EXPIRES_IN: z.string().default('7d'),
+  JWT_REFRESH_SECRET: z.string().optional(),
+  JWT_REFRESH_EXPIRES_IN: z.string().default('30d'),
 });
+
+export type EnvConfig = z.infer<typeof configSchema>;
+
+export function validateConfig(config: Record<string, unknown>): EnvConfig {
+  const result = configSchema.safeParse(config);
+
+  if (!result.success) {
+    const errors = result.error.issues
+      .map((i) => `  - ${i.path.join('.')}: ${i.message}`)
+      .join('\n');
+    throw new Error(`Config validation failed:\n${errors}`);
+  }
+
+  return result.data;
+}
