@@ -6,7 +6,7 @@ services:
       target: builder
     container_name: hrm-nest-js-dev
     ports:
-      - "3000:3000"
+      - "3002:3000"
     environment:
       NODE_ENV: development
       DB_HOST: mysql
@@ -24,23 +24,22 @@ services:
     restart: unless-stopped
 
   mysql:
-    image: mysql:8.0
+    image: mariadb:10.11
     container_name: hrm-mysql-dev
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_pass}
-      MYSQL_DATABASE: ${DB_NAME:-hrm_db}
-      MYSQL_USER: ${DB_USERNAME:-hrm_user}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-hrm_pass}
-    volumes:
-      - mysql_dev_data:/var/lib/mysql
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_pass}
+      MARIADB_DATABASE: ${DB_NAME:-hrm_db}
+      MARIADB_USER: ${DB_USERNAME:-hrm_user}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-hrm_pass}
+    # tmpfs stores data in RAM — instant init on WSL2, no slow disk I/O
+    tmpfs:
+      - /var/lib/mysql:size=512m
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
+      start_period: 10s
     restart: unless-stopped
-
-volumes:
-  mysql_dev_data:

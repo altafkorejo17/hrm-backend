@@ -1,151 +1,85 @@
-# ══════════════════════════════════════════════════════════════════════════════
-#  HRM NestJS — Makefile
-# ══════════════════════════════════════════════════════════════════════════════
-
+# ==============================================================================
+#  HRM NestJS Backend — Makefile
+#  Author : Altaf
+#  Purpose: Shorthand commands for local dev, Docker management and testing.
+#           Run `make help` to see all available targets.
+# ==============================================================================
 .DEFAULT_GOAL := help
-.PHONY: help \
-        install build start dev debug \
-        lint format \
+.PHONY: help install lint format \
         test test-watch test-cov test-e2e \
-        docker-build docker-build-dev \
-        docker-up docker-down docker-restart docker-ps docker-logs docker-shell \
-        docker-up-dev docker-down-dev docker-restart-dev docker-logs-dev docker-shell-dev \
-        docker-prune clean
+        up down reset logs shell ps \
+        prod-up prod-down prod-logs prod-shell \
+        prune clean
 
-# ── Variables ─────────────────────────────────────────────────────────────────
-
-APP_NAME   := hrm-nest-js
-IMAGE_TAG  ?= latest
-
-DC         := docker compose
-DC_DEV     := docker compose -f docker-compose.dev.yml
+DC   := docker compose -f docker-compose.dev.yml
+DC_P := docker compose
 
 # ── Help ──────────────────────────────────────────────────────────────────────
-
-help: ## Show this help
+help: ## Show available commands
 	@echo ""
-	@echo "  Usage: make <target>"
-	@echo ""
-	@awk 'BEGIN {FS = ":.*?## "} \
-		/^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}' \
-		$(MAKEFILE_LIST)
+	@awk 'BEGIN {FS=":.*?## "} /^[a-zA-Z_-]+:.*?## / \
+	  {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  LOCAL DEVELOPMENT
-# ══════════════════════════════════════════════════════════════════════════════
-
+# ── Local ─────────────────────────────────────────────────────────────────────
 install: ## Install npm dependencies
 	npm install
 
-build: ## Compile TypeScript → dist/
-	npm run build
-
-start: build ## Build then start in production mode (local)
-	npm run start:prod
-
-dev: build ## Build then start in watch mode (local)
-	npm run start:dev
-
-debug: ## Start in debug + watch mode (local)
-	npm run start:debug
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  CODE QUALITY
-# ══════════════════════════════════════════════════════════════════════════════
-
-lint: ## Run ESLint with auto-fix
+lint: ## Lint and auto-fix
 	npm run lint
 
-format: ## Run Prettier with auto-format
+format: ## Format with Prettier
 	npm run format
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  TESTING
-# ══════════════════════════════════════════════════════════════════════════════
-
+# ── Tests ─────────────────────────────────────────────────────────────────────
 test: ## Run unit tests
 	npm run test
 
 test-watch: ## Run unit tests in watch mode
 	npm run test:watch
 
-test-cov: ## Run unit tests with coverage report
+test-cov: ## Run unit tests with coverage
 	npm run test:cov
 
 test-e2e: ## Run end-to-end tests
 	npm run test:e2e
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  DOCKER — BUILD
-# ══════════════════════════════════════════════════════════════════════════════
+# ── Dev (docker-compose.dev.yml) ──────────────────────────────────────────────
+up: ## Build and start dev containers
+	$(DC) up -d --build
 
-docker-build: ## Build production image  (target: production)
-	docker build \
-		--file docker/Dockerfile \
-		--target production \
-		--tag $(APP_NAME):$(IMAGE_TAG) \
-		.
-
-docker-build-dev: ## Build development image  (target: builder)
-	docker build \
-		--file docker/Dockerfile \
-		--target builder \
-		--tag $(APP_NAME):dev \
-		.
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  DOCKER — PRODUCTION (docker-compose.yml)
-# ══════════════════════════════════════════════════════════════════════════════
-
-docker-up: ## Start all production containers (detached)
-	$(DC) up -d
-
-docker-down: ## Stop and remove production containers
+down: ## Stop dev containers
 	$(DC) down
 
-docker-restart: ## Restart production containers
-	$(DC) restart
+reset: ## Wipe dev DB volume and restart fresh  ← fixes corrupt MySQL
+	$(DC) down -v
+	$(DC) up -d --build
 
-docker-ps: ## List running production containers
-	$(DC) ps
-
-docker-logs: ## Tail production logs  (Ctrl-C to stop)
+logs: ## Tail dev logs  (Ctrl-C to stop)
 	$(DC) logs -f
 
-docker-shell: ## Open shell in production app container
+shell: ## Open shell in dev app container
 	$(DC) exec app sh
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  DOCKER — DEVELOPMENT (docker-compose.dev.yml)
-# ══════════════════════════════════════════════════════════════════════════════
+ps: ## List dev containers
+	$(DC) ps
 
-docker-dev: ## Build, start dev containers and tail logs (watch mode)
-	$(DC_DEV) up -d --build
-	$(DC_DEV) logs -f app
+# ── Production (docker-compose.yml) ───────────────────────────────────────────
+prod-up: ## Build and start prod containers
+	$(DC_P) up -d --build
 
-docker-up-dev: ## Start all development containers (detached)
-	$(DC_DEV) up -d
+prod-down: ## Stop prod containers
+	$(DC_P) down
 
-docker-down-dev: ## Stop and remove development containers
-	$(DC_DEV) down
+prod-logs: ## Tail prod logs  (Ctrl-C to stop)
+	$(DC_P) logs -f
 
-docker-restart-dev: ## Restart development containers
-	$(DC_DEV) restart
+prod-shell: ## Open shell in prod app container
+	$(DC_P) exec app sh
 
-docker-logs-dev: ## Tail development logs  (Ctrl-C to stop)
-	$(DC_DEV) logs -f
-
-docker-shell-dev: ## Open shell in development app container
-	$(DC_DEV) exec app sh
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  CLEANUP
-# ══════════════════════════════════════════════════════════════════════════════
-
-docker-prune: ## Remove stopped containers, unused images & volumes
-	docker system prune -f
-	docker volume prune -f
+# ── Cleanup ───────────────────────────────────────────────────────────────────
+prune: ## Remove stopped containers, unused images and volumes
+	docker system prune -f && docker volume prune -f
 
 clean: ## Remove dist/, coverage/ and node_modules/
 	rm -rf dist coverage node_modules

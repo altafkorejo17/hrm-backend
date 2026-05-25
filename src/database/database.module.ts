@@ -1,3 +1,13 @@
+/**
+ * @file        database/database.module.ts
+ * @description Configures the TypeORM MySQL connection using values from
+ *              ConfigService. Uses forRootAsync so the config module is fully
+ *              loaded before the DB connection is attempted.
+ *              synchronize is enabled only outside production to prevent
+ *              accidental schema changes in live environments.
+ * @author      Altaf
+ */
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';

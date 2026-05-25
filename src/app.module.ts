@@ -1,28 +1,29 @@
+/**
+ * @file        app.module.ts
+ * @description Root application module. Registers global config with Joi
+ *              validation, database connection and the health-check module.
+ * @author      Altaf
+ */
+
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { DatabaseModule } from './database/database.module';
-import databaseConfig from './config/database.config';
 import { ConfigModule } from '@nestjs/config';
+import { DatabaseModule } from './database/database.module';
+import { HealthModule } from './health/health.module';
+import appConfig from './config/app.config';
+import databaseConfig from './config/database.config';
+import jwtConfig from './config/jwt.config';
+import { configValidationSchema } from './config/config.validation';
 
 @Module({
   imports: [
-    // forRoot initializes ConfigModule once at the root level
     ConfigModule.forRoot({
-      // makes ConfigService available in every module without re-importing ConfigModule
       isGlobal: true,
-
-      // registers the database namespace config (database.host, database.port, etc.)
-      load: [databaseConfig],
-
-      // reads environment variables from this file
+      load: [appConfig, databaseConfig, jwtConfig],
       envFilePath: '.env',
+      validationSchema: configValidationSchema,
     }),
-
-    // sets up the TypeORM MySQL connection using values from ConfigService
     DatabaseModule,
+    HealthModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

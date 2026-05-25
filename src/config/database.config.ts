@@ -1,3 +1,12 @@
+/**
+ * @file        config/database.config.ts
+ * @description Registers the 'database' config namespace.
+ *              Groups all DB connection env vars (host, port, credentials, name)
+ *              under one namespace consumed by DatabaseModule.
+ *              Access via ConfigService: config.get('database.host')
+ * @author      Altaf
+ */
+
 import { registerAs } from '@nestjs/config';
 
 // Groups all DB env vars under the 'database' namespace
