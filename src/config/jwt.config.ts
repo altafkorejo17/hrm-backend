@@ -1,11 +1,3 @@
-/**
- * @file        config/jwt.config.ts
- * @description Registers the 'jwt' config namespace.
- *              Provides access token and refresh token secrets + expiry values.
- *              Access via ConfigService: config.get('jwt.secret')
- * @author      Altaf
- */
-
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('jwt', () => ({

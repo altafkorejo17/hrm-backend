@@ -1,12 +1,3 @@
-/**
- * @file        common/filters/http-exception.filter.ts
- * @description Global exception filter that catches every thrown exception
- *              (HTTP or unexpected) and returns a unified error response shape.
- *              Server errors (5xx) are logged with full stack trace.
- *              Client errors (4xx) are returned silently.
- * @author      Altaf
- */
-
 import {
   ExceptionFilter,
   Catch,

@@ -1,10 +1,3 @@
-/**
- * @file        app.module.ts
- * @description Root application module. Registers global config with Joi
- *              validation, database connection and the health-check module.
- * @author      Altaf
- */
-
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';

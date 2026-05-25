@@ -1,11 +1,3 @@
-/**
- * @file        health/health.controller.ts
- * @description Exposes GET /api/v1/health to report application liveness.
- *              Checks database connectivity via TypeORM ping.
- *              Used by Docker health checks and monitoring tools.
- * @author      Altaf
- */
-
 import { Controller, Get } from '@nestjs/common';
 import {
   HealthCheck,

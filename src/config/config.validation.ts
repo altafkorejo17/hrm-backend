@@ -1,11 +1,3 @@
-/**
- * @file        config/config.validation.ts
- * @description Joi schema that validates all required environment variables
- *              at application startup. The app will refuse to start if any
- *              required variable is missing or has an invalid value.
- * @author      Altaf
- */
-
 import * as Joi from 'joi';
 
 export const configValidationSchema = Joi.object({

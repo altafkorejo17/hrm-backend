@@ -1,12 +1,3 @@
-/**
- * @file        common/interceptors/response.interceptor.ts
- * @description Global response interceptor that wraps every successful
- *              controller return value in a consistent ApiResponse envelope.
- *              Controllers can return { message, data } to customise the
- *              message field, or return raw data directly.
- * @author      Altaf
- */
-
 import {
   Injectable,
   NestInterceptor,

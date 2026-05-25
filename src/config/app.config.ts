@@ -1,11 +1,3 @@
-/**
- * @file        config/app.config.ts
- * @description Registers the 'app' config namespace.
- *              Exposes APP_NAME, NODE_ENV and PORT from environment variables.
- *              Access via ConfigService: config.get('app.port')
- * @author      Altaf
- */
-
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('app', () => ({

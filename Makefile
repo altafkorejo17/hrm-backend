@@ -1,9 +1,4 @@
-# ==============================================================================
-#  HRM NestJS Backend — Makefile
-#  Author : Altaf
-#  Purpose: Shorthand commands for local dev, Docker management and testing.
-#           Run `make help` to see all available targets.
-# ==============================================================================
+# HRM NestJS — run `make help` for available commands
 .DEFAULT_GOAL := help
 .PHONY: help install lint format \
         test test-watch test-cov test-e2e \

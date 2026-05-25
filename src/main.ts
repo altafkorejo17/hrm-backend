@@ -1,11 +1,3 @@
-/**
- * @file        main.ts
- * @description Application entry point. Bootstraps the NestJS app with global
- *              prefix, versioning, validation pipe, exception filter,
- *              response interceptor, CORS and Swagger docs.
- * @author      Altaf
- */
-
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
