@@ -4,6 +4,7 @@
         test test-watch test-cov test-e2e \
         up down reset logs shell ps \
         prod-up prod-down prod-logs prod-shell \
+        migrate-gen migrate-run migrate-revert \
         prune clean
 
 DC   := docker compose -f docker-compose.dev.yml
@@ -71,6 +72,16 @@ prod-logs: ## Tail prod logs  (Ctrl-C to stop)
 
 prod-shell: ## Open shell in prod app container
 	$(DC_P) exec app sh
+
+# ── Migrations (run inside container so DB_HOST=mysql resolves) ───────────────
+migrate-gen: ## Generate migration  e.g. make migrate-gen name=CreateUsersTable
+	$(DC) exec app npm run migration:generate -- src/database/migrations/$(name)
+
+migrate-run: ## Run all pending migrations
+	$(DC) exec app npm run migration:run
+
+migrate-revert: ## Revert last migration
+	$(DC) exec app npm run migration:revert
 
 # ── Cleanup ───────────────────────────────────────────────────────────────────
 prune: ## Remove stopped containers, unused images and volumes

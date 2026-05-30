@@ -6,6 +6,7 @@ import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 import { validateConfig } from './config/config.validation';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { validateConfig } from './config/config.validation';
     }),
     DatabaseModule,
     HealthModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
